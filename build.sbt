@@ -5,18 +5,23 @@ lazy val buildSettings = Seq(
   description := "This program was copied from `eed3si9n` as my hobby and study",
   licenses := Seq("MIT License" -> url("http://opensource.org/licenses/mit-license.php/")),
   scalaVersion in ThisBuild := "2.11.8",
-  scalacOptions := Seq("-deprecation", "-unchecked"),
+  scalacOptions := Seq("-target:jvm-1.7", "-deprecation", "-unchecked"),
   initialCommands in console := "",
 
-  resolvers += Resolver.sonatypeRepo("public")
+  resolvers ++= Seq(
+    Resolver.sonatypeRepo("public"),
+    Resolver.typesafeRepo("releases")
+  )
 )
 
 lazy val specs2version = "3.8.5"
+lazy val akkaVersion = "2.3.15"
 lazy val libDeps = Def.setting {
   Seq(
     "org.specs2" %% "specs2-core" % specs2version % "test",
     "ch.qos.logback" % "logback-classic" % "1.1.7",
-    "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0"
+    "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
+    "com.typesafe.akka" %% "akka-actor" % akkaVersion
   )
 }
 

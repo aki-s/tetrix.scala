@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
-    <!--<property name="fmt" value="%d{HH:mm:ss.SSS} | %-5level | %-40thread | %-30X{akkaSource} | %-20logger{1} | %m%n%rEx"/>-->
-    <property name="fmt" value="%d{HH:mm:ss.SSS} | %-5level | %-30thread | %-20logger{1} | %m%n%rEx"/>
+    <property name="fmt" value="%d{HH:mm:ss.SSS} | %-5level | %-40thread | %-30X{akkaSource} | %-20logger{1} | %m%n%rEx"/>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <target>System.out</target>
         <encoder>
