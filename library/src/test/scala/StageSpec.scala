@@ -27,6 +27,9 @@ class StageSpec extends Specification {
 
   Dropping the current piece should
     tick the piece until it hits something.          $drop1
+
+  Spawning a new piece should
+    end the game if it hits a block.               $spawn1
   """
 
   // s1
@@ -67,6 +70,9 @@ class StageSpec extends Specification {
       (0, 0), (4, 0), (5, 0), (6, 0), (5, 1),
       (4, 18), (5, 18), (6, 18), (5, 19)
     )).inOrder
+
+  val stackedBlock = (0 to view.Size._2).map{ y => Block((view.Size._1/2, y), Dummy) }
+  def spawn1 = newState(stackedBlock, view.Size, randomStream(new scala.util.Random)).status must_== GameOver
 
   // s3
   val s3 = newState(Seq(

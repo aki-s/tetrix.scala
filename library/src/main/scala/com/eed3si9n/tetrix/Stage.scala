@@ -11,11 +11,11 @@ object Stage {
     PieceKind(random.nextInt(7)) #:: randomStream(random)
 
   def newState(blocks: Seq[Block], gridSize: view.Grid, kinds: Seq[PieceKind]): GameState = {
-    val dummy = Piece((-1, -1), TKind)
+    val dummy = Piece((0, 0), Dummy) // TODO: change to pre-defined DummyPiece object
     spawn(spawn(GameState(Nil, gridSize, dummy, dummy, kinds)).copy(blocks = blocks))
   }
 
-  @deprecated("", "day3")
+  @deprecated("Only used in unit testing", "day3")
   def newState(blocks: Seq[Block]): GameState = {
     val size = view.Size
     def dropOffPos = (size._1 / 2.0, size._2 - 2.0) // Center pos of a piece // index start with 0
@@ -34,11 +34,18 @@ object Stage {
 
   private[this] lazy val spawn: GameState => GameState =
     (s: GameState) => {
-      def dropOffPos = (s.gridSize._1 / 2.0, s.gridSize._2 - 2.0)
-      val next = Piece(dropOffPos, s.kinds.head)
-      val p = s.nextPiece
-      s.copy(blocks = s.blocks ++ p.current, currentPiece = p,
-        nextPiece = next, kinds = s.kinds.tail)
+      val next = Piece(s.dropOffPos, s.kinds.head)
+      val spawned = s.nextPiece
+      val s1 = s.copy(blocks = s.blocks,
+        currentPiece = spawned,
+        nextPiece = next,
+        kinds = s.kinds.tail
+      )
+      validate(s1) map { x =>
+        x.copy(blocks = load(x.currentPiece, x.blocks))
+      } getOrElse {
+        s1.copy(blocks = load(s1.currentPiece, s1.blocks), status = GameOver)
+      }
     }
 
   private[this] lazy val clearFullRow: GameState => GameState =
@@ -58,14 +65,19 @@ object Stage {
       onFail: GameState => GameState = identity
   ): GameState => GameState = {
     (s0: GameState) =>
-      val s1 = s0.copy(
-        blocks = unload(s0.currentPiece, s0.blocks),
-        currentPiece = trans(s0.currentPiece))
-      validate(s1) map {
-        case x =>
-          logger.debug(s"${x.currentPiece} => ${x.currentPiece.current}|${x.blocks}")
-          x.copy(blocks = load(x.currentPiece, x.blocks))
-      } getOrElse { onFail(s0) }
+      s0.status match {
+        case ActiveStatus =>
+          val s1 = s0.copy(
+            blocks = unload(s0.currentPiece, s0.blocks),
+            currentPiece = trans(s0.currentPiece))
+          validate(s1) map { x =>
+              logger.debug(s"${x.currentPiece} => ${x.currentPiece.current}|${x.blocks}")
+              x.copy(blocks = load(x.currentPiece, x.blocks))
+          } getOrElse { onFail(s0) }
+        case GameOver =>
+          logger.debug("No transit because of GameOver.")
+          s0
+      }
   }
   /** Return None if collision happened. */
   private[this] def validate(s: GameState): Option[GameState] = {

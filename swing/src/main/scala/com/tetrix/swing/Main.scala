@@ -38,9 +38,11 @@ object Main extends SimpleSwingApplication {
 
   def onPaint(g: Graphics2D): Unit = {
     val view1 = ui.stView
+    // Game field
     drawBoard(g, (blockUnit, 0), view1.gridSize, view1.blocks, view1.current.map(_.pos))
     logger.debug(view1.toString)
 
+    // Next Piece
     val offset = ((view.Size._1 + 2) * blockUnit, 0)
     drawBoard(g, offset, view.MiniGridSize, Nil,
       view1.next.head.kind.basicPos)
@@ -49,6 +51,12 @@ object Main extends SimpleSwingApplication {
     for { y <- 0 until view1.gridSize._2 } {
       val (yX, yY) = newAxis((0, blockUnit/2), view1.gridSize, (0, y))
       g.drawString(s"$y", yX, yY)
+    }
+
+    // Show GameStatus
+    view1.status match {
+      case GameOver => g.drawString("game over", blockUnit, blockUnit)
+      case ActiveStatus => // no-op
     }
   }
 
@@ -121,7 +129,7 @@ object Main extends SimpleSwingApplication {
     val timer = new javax.swing.Timer(view.FRate, new AbstractAction() {
       override def actionPerformed(e: ActionEvent): Unit = repaint
     })
-    timer.start()
+    timer.start() // TODO stop timer if GameOver
   }
 
 }

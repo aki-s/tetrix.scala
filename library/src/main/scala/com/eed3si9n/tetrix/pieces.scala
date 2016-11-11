@@ -29,6 +29,7 @@ case object TKind extends PieceKind {
 case object ZKind extends PieceKind {
   override val basicPos: Seq[(Int, Int)] = Seq((1, 0), (2, 0), (0, 1), (1, 1))
 }
+/** Have reference to no existing point. */
 case object Dummy extends PieceKind {
   override val basicPos: Seq[(Int, Int)] = Seq()
 }
@@ -45,6 +46,10 @@ case object PieceKind {
   }
 }
 
+sealed trait GameStatus
+case object ActiveStatus extends GameStatus
+case object GameOver extends GameStatus
+
 /**
   *
   * @param pos center position
@@ -52,7 +57,7 @@ case object PieceKind {
   */
 case class Block(pos: Grid, kind: PieceKind)
 case class GameView(blocks: Seq[Block], gridSize: Grid,
-    current: Seq[Block], next: Seq[Block]) {
+    current: Seq[Block], next: Seq[Block], status: GameStatus) {
 }
 
 /**
@@ -64,9 +69,10 @@ case class GameView(blocks: Seq[Block], gridSize: Grid,
   * @param kinds to generate nextPiece
   */
 case class GameState(blocks: Seq[Block], gridSize: Grid, currentPiece: Piece,
-    nextPiece: Piece, kinds: Seq[PieceKind]) {
+    nextPiece: Piece, kinds: Seq[PieceKind], status: GameStatus = ActiveStatus) {
   def view: GameView = GameView(blocks, gridSize,
-    currentPiece.current, nextPiece.current)
+    currentPiece.current, nextPiece.current, status)
+  def dropOffPos = (gridSize._1 / 2.0, gridSize._2 - 2.0)
 }
 
 // pos: (Int, Int)
@@ -105,6 +111,6 @@ case object Piece {
     case ZKind => Piece(pos, kind, Seq((0.0, -0.5), (1.0, -0.5), (-1.0, 0.5), (0.0, 0.5)))
 
     case TKind => Piece(pos, kind, Seq((-1.0, 0.0), (0.0, 0.0), (1.0, 0.0), (0.0, 1.0)))
-    case Dummy => Piece(pos, kind, Seq((-1.0, -1.0)))
+    case Dummy => Piece((0, 0), kind, Seq.empty)
   }
 }
