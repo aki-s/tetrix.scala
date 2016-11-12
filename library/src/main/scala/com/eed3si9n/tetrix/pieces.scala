@@ -72,7 +72,7 @@ case class GameState(blocks: Seq[Block], gridSize: Grid, currentPiece: Piece,
     nextPiece: Piece, kinds: Seq[PieceKind], status: GameStatus = ActiveStatus) {
   def view: GameView = GameView(blocks, gridSize,
     currentPiece.current, nextPiece.current, status)
-  def dropOffPos = (gridSize._1 / 2.0, gridSize._2 - 2.0)
+  def dropOffPos = (gridSize._1 / 2.0, gridSize._2 - 0.0)
 }
 
 // pos: (Int, Int)

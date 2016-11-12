@@ -89,11 +89,11 @@ object Main extends SimpleSwingApplication {
     }
     def drawBlocks(): Unit = {
       g setColor bluishEvenLigher
-      allBlocks foreach { b => g fill buildRect(b.pos) }
+      allBlocks foreach { b => if (b.pos._2 < gridSize._2) g fill buildRect(b.pos) }
     }
     def drawCurrent(): Unit = {
       g setColor bluishSilver
-      currentBlocks foreach { b => g fill buildRect(b) }
+      currentBlocks filter { _._2 < gridSize._2 } foreach { b => g fill buildRect(b) }
     }
 
     drawEmptyGrid()

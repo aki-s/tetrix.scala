@@ -83,7 +83,7 @@ object Stage {
   private[this] def validate(s: GameState): Option[GameState] = {
     val size = s.gridSize
     def inBounds(pos: (Int, Int)): Boolean =
-      (0 <= pos._1) && (pos._1 < size._1) && (0 <= pos._2) && (pos._2 < size._2)
+      (0 <= pos._1) && (pos._1 < size._1) && (0 <= pos._2)
     val currentPoss = s.currentPiece.current map {_.pos}
     if ((currentPoss forall inBounds) &&
       (s.blocks map {_.pos} intersect currentPoss).isEmpty) Some(s)

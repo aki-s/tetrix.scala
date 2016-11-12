@@ -89,7 +89,7 @@ class StageSpec extends Specification {
   def init1 =
     (s4.currentPiece.kind must_== OKind) and
       (s4.blocks map {_.pos} must contain(exactly(
-        (4, 18), (5, 18), (4, 17), (5, 17)
-      )).inOrder)
+        (4, 19), (5, 19), (4, 20), (5, 20)
+      )))
 
 }
