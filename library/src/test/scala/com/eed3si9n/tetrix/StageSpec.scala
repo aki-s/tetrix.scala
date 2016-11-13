@@ -1,6 +1,7 @@
+package com.eed3si9n.tetrix
+
 import com.eed3si9n.tetrix.Stage._
-import com.eed3si9n.tetrix._
-import org.specs2._
+import org.specs2.Specification
 
 class StageSpec extends Specification {
   def is =  s2"""
@@ -14,7 +15,7 @@ class StageSpec extends Specification {
     change the blocks in the view.                 $right1
 
   Rotating the current piece should
-    change the blocks in the view.                  $rotate1
+    change the blocks in the view.                 $rotate1
 
   Ticking the current piece should
     change the blocks in the view,                 $tick1
@@ -26,7 +27,7 @@ class StageSpec extends Specification {
     be initialized to the first element in the state. $init1
 
   Dropping the current piece should
-    tick the piece until it hits something.          $drop1
+    tick the piece until it hits something.        $drop1
 
   Spawning a new piece should
     end the game if it hits a block.               $spawn1
@@ -79,10 +80,10 @@ class StageSpec extends Specification {
     (0, 0), (1, 0), (2, 0), (3, 0), (7, 0), (8, 0), (9, 0))
     map { Block(_, TKind) })
   def tick3 =
-  Function.chain(Nil padTo (19, tick))(s3).
-    blocks map {_.pos} must contain(
-    (5, 0)
-  )
+    Function.chain(Nil padTo (19, tick))(s3).
+      blocks map {_.pos} must contain(
+      (5, 0)
+    )
 
   // s4
   val s4 = newState(Nil, view.Size, Seq(OKind, Dummy))
