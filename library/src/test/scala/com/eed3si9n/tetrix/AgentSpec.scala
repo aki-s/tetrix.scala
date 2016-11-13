@@ -14,6 +14,10 @@ class AgentSpec extends Specification {
       |   evaluate GameOver as -1000.0,          $utility2
       |   evaluate an active state by lineCount  $utility3
       |
+      | Solver should
+      |   pick MoveLeft for s1                   $solver1
+      |   pick Drop for s3                       $solver2
+      |
     """.stripMargin
 
   val agent = new Agent
@@ -24,9 +28,17 @@ class AgentSpec extends Specification {
   def utility2 =
     agent.utility(st1.copy(status = GameOver)) must_== -1000.0
 
+  val rowToBeFilled = Seq((0, 0), (1, 0), (2, 0), (3, 0), (6, 0), (7, 0), (8, 0), (9, 0)) map { Block(_, Dummy) }
+  /** State that just dropping the current piece clears a row. */
+  val st3 = Stage.newState(rowToBeFilled, view.Size, Seq(OKind, Dummy, Dummy))
   def utility3 = {
-    val rowToBeFilled = Seq((0, 0), (1, 0), (2, 0), (3, 0), (6, 0), (7, 0), (8, 0), (9, 0)) map { Block(_, Dummy) }
-    val s = Function.chain(Nil padTo (20, Stage.tick))(Stage.newState(rowToBeFilled, view.Size, Seq(OKind, Dummy, Dummy)))
+    val s = Function.chain(Nil padTo (20, Stage.tick))(st3)
     agent.utility(s) must_== 1.0
   }
+
+  def solver1 =
+    agent.bestMove(st1) must_== MoveLeft
+  def solver2 =
+    agent.bestMove(st3) must_== Drop
+
 }
