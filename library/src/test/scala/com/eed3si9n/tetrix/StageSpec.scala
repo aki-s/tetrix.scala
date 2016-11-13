@@ -4,6 +4,7 @@ import com.eed3si9n.tetrix.Stage._
 import org.specs2.Specification
 
 class StageSpec extends Specification {
+  import StageSpec.newState
   def is =  s2"""
  This is a specification to check Stage
 
@@ -73,7 +74,7 @@ class StageSpec extends Specification {
     )).inOrder
 
   val stackedBlock = (0 to view.Size._2).map{ y => Block((view.Size._1/2, y), Dummy) }
-  def spawn1 = newState(stackedBlock, view.Size, randomStream(new scala.util.Random)).status must_== GameOver
+  def spawn1 = Stage.newState(stackedBlock, view.Size, randomStream(new scala.util.Random)).status must_== GameOver
 
   // s3
   val s3 = newState(Seq(
@@ -86,11 +87,23 @@ class StageSpec extends Specification {
     )
 
   // s4
-  val s4 = newState(Nil, view.Size, Seq(OKind, Dummy))
+  val s4 = Stage.newState(Nil, view.Size, Seq(OKind, Dummy))
   def init1 =
     (s4.currentPiece.kind must_== OKind) and
       (s4.blocks map {_.pos} must contain(exactly(
         (4, 19), (5, 19), (4, 20), (5, 20)
       )))
+
+}
+
+object StageSpec {
+
+  def newState(blocks: Seq[Block]): GameState = {
+    val size = view.Size
+    def dropOffPos = (size._1 / 2.0, size._2 - 2.0) // Center pos of a piece // index start with 0
+    val p = Piece(dropOffPos, TKind)
+    val next = Piece(dropOffPos, TKind)
+    GameState(blocks ++ p.current, size, p, next, Seq(next.kind))
+  }
 
 }

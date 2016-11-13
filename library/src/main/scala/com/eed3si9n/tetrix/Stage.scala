@@ -10,18 +10,18 @@ object Stage {
   def randomStream(random: util.Random): Stream[PieceKind] =
     PieceKind(random.nextInt(7)) #:: randomStream(random)
 
+  /** Generate new game state.
+    *
+    * @param blocks pre existing blocks
+    * @param gridSize stage size
+    * @param kinds kinds of future pieces in tern.
+    *              There must be 2 elements for current and next piece at least.
+    *              There must be 3 elements when next piece becomes current.
+    * @return
+    */
   def newState(blocks: Seq[Block], gridSize: view.Grid, kinds: Seq[PieceKind]): GameState = {
     val dummy = Piece((0, 0), Dummy) // TODO: change to pre-defined DummyPiece object
     spawn(spawn(GameState(Nil, gridSize, dummy, dummy, kinds)).copy(blocks = blocks))
-  }
-
-  @deprecated("Only used in unit testing", "day3")
-  def newState(blocks: Seq[Block]): GameState = {
-    val size = view.Size
-    def dropOffPos = (size._1 / 2.0, size._2 - 2.0) // Center pos of a piece // index start with 0
-    val p = Piece(dropOffPos, TKind)
-    val next = Piece(dropOffPos, TKind) // fixme dummy
-    GameState(blocks ++ p.current, size, p, next, Seq(next.kind)) // fixme kind & piece
   }
 
   def moveLeft = transit { _.moveBy(-1.0, 0.0) }
