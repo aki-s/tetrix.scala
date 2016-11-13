@@ -48,32 +48,53 @@ object Stage {
       }
     }
 
+  /** Clear a row if it is full.
+    *
+    * - Check row `y` (>=0) is full
+    * - Scan range from `y` to 0, then clear each row if it is full
+    * - When row `y` is cleared, shift all blocks above `y` downward
+    * - Count up by 1 if row is cleared
+    */
   private[this] lazy val clearFullRow: GameState => GameState =
-    (s0: GameState) => {
-      def isFullRow(y: Int, s: GameState): Boolean =
-        s.blocks.count (_.pos._2 == y) == s.gridSize._1
-      @tailrec def tryRow(y: Int, s: GameState): GameState =
-        if (y < 0) s
-        else if (isFullRow(y, s))
-          tryRow(y - 1, s.copy(blocks = (s.blocks filter {_.pos._2 < y})
-            ++ (s.blocks filter {_.pos._2 > y} map { b => b.copy(pos = (b.pos._1, b.pos._2 - 1))})))
-        else tryRow(y - 1, s)
-      tryRow(s0.gridSize._2 - 1, s0)
-    }
+  (s0: GameState) => {
+    /** Check row `y` is full.  */
+    def isFullRow(y: Int, s: GameState): Boolean =
+    s.blocks.count (_.pos._2 == y) == s.gridSize._1
 
+    /** Scan range from `y` to 0, then clear each row if it is full. */
+    @tailrec
+    def tryRow(y: Int, s: GameState): GameState =
+    if (y < 0) s
+    else if (isFullRow(y, s))
+    // When row `y` is cleared, shift all blocks above `y` downward.
+      tryRow(y - 1, s.copy(blocks = (s.blocks filter {_.pos._2 < y})
+        ++ (s.blocks filter {_.pos._2 > y} map { b => b.copy(pos = (b.pos._1, b.pos._2 - 1))}),
+        lineCount = s.lineCount + 1))
+    else tryRow(y - 1, s)
+
+    tryRow(s0.gridSize._2 - 1, s0)
+  }
+
+  /** Transit game status. */
   private[this] def transit(trans: Piece => Piece,
       onFail: GameState => GameState = identity
   ): GameState => GameState = {
     (s0: GameState) =>
       s0.status match {
         case ActiveStatus =>
-          val s1 = s0.copy(
+          val sTmp = s0.copy(
             blocks = unload(s0.currentPiece, s0.blocks),
             currentPiece = trans(s0.currentPiece))
-          validate(s1) map { x =>
-              logger.debug(s"${x.currentPiece} => ${x.currentPiece.current}|${x.blocks}")
-              x.copy(blocks = load(x.currentPiece, x.blocks))
-          } getOrElse { onFail(s0) }
+          validate(sTmp) map { x =>
+            val s1 = x.copy(blocks = load(x.currentPiece, x.blocks))
+            logger.debug(s"""
+                            |Try to transit from `$s0`
+                            |                 to `$s1` for current blocks `${s0.currentPiece.current}`""".stripMargin)
+            s1
+          } getOrElse {
+            logger.debug(s"Transit failed for `$s0`")
+            onFail(s0)
+          }
         case GameOver =>
           logger.debug("No transit because of GameOver.")
           s0

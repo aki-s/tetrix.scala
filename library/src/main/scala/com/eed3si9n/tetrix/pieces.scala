@@ -63,13 +63,16 @@ case class GameView(blocks: Seq[Block], gridSize: Grid,
 /**
   *
   * @param blocks all blocks in view (includes blocks of `currentPiece`)?
-  * @param gridSize
+  * @param gridSize size of stage
   * @param currentPiece
   * @param nextPiece
   * @param kinds to generate nextPiece
+  * @param status game status
+  * @param lineCount count how many times row is cleared
   */
 case class GameState(blocks: Seq[Block], gridSize: Grid, currentPiece: Piece,
-    nextPiece: Piece, kinds: Seq[PieceKind], status: GameStatus = ActiveStatus) {
+    nextPiece: Piece, kinds: Seq[PieceKind], status: GameStatus = ActiveStatus,
+    lineCount: Int = 0) {
   def view: GameView = GameView(blocks, gridSize,
     currentPiece.current, nextPiece.current, status)
   def dropOffPos = (gridSize._1 / 2.0, gridSize._2 - 0.0)

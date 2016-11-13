@@ -32,6 +32,9 @@ class StageSpec extends Specification {
 
   Spawning a new piece should
     end the game if it hits a block.               $spawn1
+
+  Deleting a full row should
+    increment the line count.                      $line1
   """
 
   // s1
@@ -85,6 +88,7 @@ class StageSpec extends Specification {
       blocks map {_.pos} must contain(
       (5, 0)
     )
+  def line1 = (s3.lineCount must_== 0) and (Function.chain(Nil padTo (19, tick))(s3).lineCount must_== 1)
 
   // s4
   val s4 = Stage.newState(Nil, view.Size, Seq(OKind, Dummy))
