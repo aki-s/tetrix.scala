@@ -118,5 +118,16 @@ object Stage {
   }
   /** Load current blocks of `p` into `bs`. */
   private def load(p: Piece, bs: Seq[Block]): Seq[Block] = bs ++ p.current
+
+  private[tetrix] val possibleMoves: Seq[StageMessage] =
+    Seq(MoveLeft, MoveRight, RotateCW, Tick, Drop)
+  private[tetrix] def toTrans(message: StageMessage): GameState => GameState = message match {
+    case MoveLeft  => moveLeft
+    case MoveRight => moveRight
+    case RotateCW  => rotateCW
+    case Tick      => tick
+    case Drop      => drop
+  }
+
 }
 
