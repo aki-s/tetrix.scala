@@ -13,6 +13,7 @@ class AgentSpec extends Specification {
       |   evaluate initial state as 0.0,         $utility1
       |   evaluate GameOver as -1000.0,          $utility2
       |   evaluate an active state by lineCount  $utility3
+      |   penalize having gaps between the columns $utility4
       |
       | Solver should
       |   pick MoveLeft for s1                   $solver1
@@ -33,7 +34,13 @@ class AgentSpec extends Specification {
   val st3 = Stage.newState(rowToBeFilled, view.Size, Seq(OKind, Dummy, Dummy))
   def utility3 = {
     val s = Function.chain(Nil padTo (20, Stage.tick))(st3)
-    agent.utility(s) must_== 1.0
+    agent.utility(s) must_== -1.0
+  }
+  def utility4 = {
+    val s = Stage.newState(Seq(
+      (0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5))
+      map { Block(_, TKind) }, (10, 20), TKind :: TKind :: Nil)
+    agent.utility(s) must_== -36.0
   }
 
   def solver1 =

@@ -73,9 +73,21 @@ case class GameView(blocks: Seq[Block], gridSize: Grid,
 case class GameState(blocks: Seq[Block], gridSize: Grid, currentPiece: Piece,
     nextPiece: Piece, kinds: Seq[PieceKind], status: GameStatus = ActiveStatus,
     lineCount: Int = 0) {
+
   def view: GameView = GameView(blocks, gridSize,
     currentPiece.current, nextPiece.current, status)
+
   def dropOffPos = (gridSize._1 / 2.0, gridSize._2 - 0.0)
+
+  /** Unload current blocks of `p` from blocks and return new copy of State object. */
+  def unload(p: Piece): GameState = {
+    val currentPos = p.current map {_.pos}
+    this.copy(blocks = blocks filterNot { currentPos contains _.pos })
+  }
+
+  /** Load current blocks of `p` into blocks and return new copy of State object. */
+  def load(p: Piece): GameState = this.copy(blocks = blocks ++ p.current)
+
 }
 
 // pos: (Int, Int)

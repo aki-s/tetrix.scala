@@ -42,9 +42,9 @@ object Stage {
         kinds = s.kinds.tail
       )
       validate(s1) map { x =>
-        x.copy(blocks = load(x.currentPiece, x.blocks))
+        x.load(x.currentPiece)
       } getOrElse {
-        s1.copy(blocks = load(s1.currentPiece, s1.blocks), status = GameOver)
+        s1.load(s1.currentPiece).copy(status = GameOver)
       }
     }
 
@@ -82,11 +82,10 @@ object Stage {
     (s0: GameState) =>
       s0.status match {
         case ActiveStatus =>
-          val sTmp = s0.copy(
-            blocks = unload(s0.currentPiece, s0.blocks),
+          val sTmp = s0.unload(s0.currentPiece).copy(
             currentPiece = trans(s0.currentPiece))
           validate(sTmp) map { x =>
-            val s1 = x.copy(blocks = load(x.currentPiece, x.blocks))
+            val s1 = x.load(x.currentPiece)
             logger.debug(s"""
                             |Try to transit from `$s0`
                             |                 to `$s1` for current blocks `${s0.currentPiece.current}`""".stripMargin)
@@ -111,13 +110,6 @@ object Stage {
     else None
   }
 
-  /** Unload current blocks of `p` from `bs`. */
-  private def unload(p: Piece, bs: Seq[Block]): Seq[Block] = {
-    val currentPos = p.current map {_.pos}
-    bs filterNot { currentPos contains _.pos }
-  }
-  /** Load current blocks of `p` into `bs`. */
-  private def load(p: Piece, bs: Seq[Block]): Seq[Block] = bs ++ p.current
 
   private[tetrix] val possibleMoves: Seq[StageMessage] =
     Seq(MoveLeft, MoveRight, RotateCW, Tick, Drop)
