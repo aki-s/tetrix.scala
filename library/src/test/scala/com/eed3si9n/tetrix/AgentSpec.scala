@@ -41,6 +41,11 @@ class AgentSpec extends Specification {
       (0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5))
       map { Block(_, TKind) }, (10, 20), TKind :: TKind :: Nil)
     agent.utility(s) must_== -36.0
+    true
+  } and {
+    val s = Stage.newState(Seq((1, 0), (1, 1), (2, 1), (2, 2))
+      map { Block(_, ZKind) }, (10, 20), TKind :: TKind :: Nil)
+    agent.utility(s) must_== -14.0
   }
 
   def solver1 =

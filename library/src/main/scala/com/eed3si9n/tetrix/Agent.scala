@@ -8,11 +8,13 @@ class Agent {
     if (state.status == GameOver) -1000.0
     else state.lineCount.toDouble - penalty(state)
 
+  /** {{{ Penalty := sum_i |(diff of height of adjacent column)_i|^2 }}} */
   private[this] def penalty(s: GameState): Double = {
+    // (x,y) = (x, 0-based-height)
     val heights = s.unload(s.currentPiece).blocks map { _.pos } groupBy {
-      _._1 } map { case (k, v) => (k, v.size) }
+      _._1 } map { case (k, v) => (k, v.map(_._2).max) }
     val gaps = (0 to s.gridSize._1 - 2) map { x =>
-      heights.getOrElse(x, 0) - heights.getOrElse(x + 1, 0)
+      heights.getOrElse(x, -1) - heights.getOrElse(x + 1, -1)
     } filter { math.abs(_) > 0 } // Intentionally `>0`, not `>1`
     gaps map { x => x * x } sum
   }
