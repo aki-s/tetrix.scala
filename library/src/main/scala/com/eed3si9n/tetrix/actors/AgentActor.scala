@@ -1,7 +1,7 @@
 package com.eed3si9n.tetrix.actors
 
 import akka.actor.{Actor, ActorRef}
-import com.eed3si9n.tetrix.{Agent, GameState}
+import com.eed3si9n.tetrix.{Agent, Drop, GameState}
 import com.typesafe.scalalogging.StrictLogging
 
 sealed trait AgentMessage
@@ -14,7 +14,7 @@ class AgentActor(stageActor: ActorRef) extends Actor with StrictLogging {
     case BestMove(s: GameState) =>
       val message = agent.bestMove(s)
       logger.debug("selected " + message)
-      stageActor ! message
+      if (message ne Drop) stageActor ! message
   }
 }
 
