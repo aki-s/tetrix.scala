@@ -6,7 +6,6 @@ lazy val buildSettings = Seq(
   licenses := Seq("MIT License" -> url("http://opensource.org/licenses/mit-license.php/")),
   scalaVersion in ThisBuild := "2.11.8",
   scalacOptions := Seq("-target:jvm-1.7", "-deprecation", "-unchecked"),
-  initialCommands in console := "",
 
   resolvers ++= Seq(
     Resolver.sonatypeRepo("public"),
@@ -36,7 +35,11 @@ lazy val root = (project in file(".")).
 lazy val library = (project in file("library")).
   settings(buildSettings: _*).
   settings(
-    libraryDependencies ++= libDeps.value
+    libraryDependencies ++= libDeps.value,
+    initialCommands in console :=
+      """import com.eed3si9n.tetrix._
+        |import Stage._
+      """.stripMargin,
   )
 
 lazy val swing = (project in file("swing")).
