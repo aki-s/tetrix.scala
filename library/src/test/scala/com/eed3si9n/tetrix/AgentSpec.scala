@@ -13,11 +13,14 @@ class AgentSpec extends Specification {
       |   evaluate initial state as 0.0,         $utility1
       |   evaluate GameOver as -1000.0,          $utility2
       |   evaluate an active state by lineCount  $utility3
-      |   penalize having gaps between the columns $utility4
+      |   penalize having gaps between the columns !utility4^ // Other Idea: Implement penalty no blank space between blocks?
       |
       | Solver should
       |   pick MoveLeft for s1                   $solver1
       |   pick Drop for s3                       $solver2
+      |
+      |  Penalty function should
+      |    penalize having blocks stacked up high $penalty1
       |
     """.stripMargin
 
@@ -52,5 +55,16 @@ class AgentSpec extends Specification {
     agent.bestMove(st1) must_== MoveLeft
   def solver2 =
     agent.bestMove(st3) must_== Drop
+
+  def penalty1 = {
+    val s = Stage.newState(Seq(
+      (0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6))
+      map { Block(_, Dummy) }, (10, 20), Dummy:: Dummy:: Nil)
+    agent.penalty(s) must_== 49.0
+  } and {
+    val s = Stage.newState(Seq((1, 0))
+      map { Block(_, Dummy) }, (10, 20), Dummy :: Dummy :: Nil)
+    agent.penalty(s) must_== 1.0
+  }
 
 }

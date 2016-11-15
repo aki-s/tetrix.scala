@@ -4,21 +4,27 @@ class Agent {
 
   private[this] val MinUtility = -1000.0
 
+  /** Calculate score.
+    *
+    * The greater score is, the better decision is.
+    */
   def utility(state: GameState): Double =
-    if (state.status == GameOver) -1000.0
-    else state.lineCount.toDouble - penalty(state)
+    if (state.status == GameOver) MinUtility
+    else reward(state) - penalty(state)
 
-  /** {{{ Penalty := sum_i |(diff of height of adjacent column)_i|^2 }}} */
-  private[this] def penalty(s: GameState): Double = {
-    // (x,y) = (x, 0-based-height)
-    val heights = s.unload(s.currentPiece).blocks map { _.pos } groupBy {
-      _._1 } map { case (k, v) => (k, v.map(_._2).max) }
-    val gaps = (0 to s.gridSize._1 - 2) map { x =>
-      heights.getOrElse(x, -1) - heights.getOrElse(x + 1, -1)
-    } filter { math.abs(_) > 0 } // Intentionally `>0`, not `>1`
-    gaps map { x => x * x } sum
+  private[tetrix] def reward(s: GameState): Double = {
+    s.lineCount.toDouble
   }
 
+  /** {{{ Penalty := sum_i |height_i|^2 }}} */
+  private[tetrix] def penalty(s: GameState): Double = {
+    /** 1-based-height for each column. */
+    val heights = s.unload(s.currentPiece).blocks map { _.pos } groupBy {
+      _._1 } map { case (k, v) => v.map {_._2 + 1} max }
+    heights map { x => x * x } sum
+  }
+
+  /** Best move based on score. */
   def bestMove(s0: GameState): StageMessage = {
     var ret: StageMessage = MoveLeft
     var current: Double = MinUtility
