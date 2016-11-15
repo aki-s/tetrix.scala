@@ -1,6 +1,8 @@
 package com.eed3si9n.tetrix
 
-class Agent {
+import com.typesafe.scalalogging.StrictLogging
+
+class Agent extends StrictLogging {
 
   private[this] val MinUtility = -1000.0
 
@@ -27,14 +29,15 @@ class Agent {
   /** Best move based on score. */
   def bestMove(s0: GameState): StageMessage = {
     var ret: StageMessage = MoveLeft
-    var current: Double = MinUtility
+    var score: Double = MinUtility
     Stage.possibleMoves foreach { m =>
       val u = utility(Stage.toTrans(m)(s0))
-      if (u > current) {
-        current = u
+      if (u > score) {
+        score = u
         ret = m
       }
     }
+    logger.debug(s"Score $score for strategy $ret.")
     ret
   }
 
