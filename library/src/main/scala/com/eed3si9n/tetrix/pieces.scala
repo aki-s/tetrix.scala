@@ -128,4 +128,17 @@ case object Piece {
     case TKind => Piece(pos, kind, Seq((-1.0, 0.0), (0.0, 0.0), (1.0, 0.0), (0.0, 1.0)))
     case Dummy => Piece((0, 0), kind, Seq.empty)
   }
+
+  private[tetrix] def orientation(kind: PieceKind): Int = {
+    kind match {
+      case IKind => 2
+      case JKind => 4
+      case LKind => 4
+      case OKind => 1
+      case SKind => 2
+      case TKind => 4
+      case ZKind => 2
+    }
+  }
+
 }

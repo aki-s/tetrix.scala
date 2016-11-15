@@ -22,6 +22,9 @@ class AgentSpec extends Specification {
       |  Penalty function should
       |    penalize having blocks stacked up high $penalty1
       |
+      |  ActionSeqs function should
+      |    list out potential action sequences   $actionSeqs1
+      |
     """.stripMargin
 
   val agent = new Agent
@@ -65,6 +68,14 @@ class AgentSpec extends Specification {
     val s = Stage.newState(Seq((1, 0))
       map { Block(_, Dummy) }, (10, 20), Dummy :: Dummy :: Nil)
     agent.penalty(s) must_== 1.0
+  }
+
+  def actionSeqs1 = {
+    val s = Stage.newState(Nil, (10, 20), TKind :: TKind :: Nil)
+    val seqs = agent.actionSeqs(s)
+    seqs.size must_== 32 /** (width - width_of_TKind + 1) * rotate_patterns = 8*4 .. quasi-size
+      * Width should be calculated for each rotate_pattern.
+      */
   }
 
 }
