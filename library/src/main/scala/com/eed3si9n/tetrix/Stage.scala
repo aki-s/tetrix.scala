@@ -16,7 +16,8 @@ object Stage {
     * @param gridSize stage size
     * @param kinds kinds of future pieces in tern.
     *              There must be 2 elements for current and next piece at least.
-    *              There must be 3 elements when next piece becomes current.
+    *              There must be 3 elements when next piece becomes current
+    *              (This imply calculating best move requires 3 by considering clearance of rows.)
     * @return
     */
   def newState(blocks: Seq[Block], gridSize: view.Grid, kinds: Seq[PieceKind]): GameState = {

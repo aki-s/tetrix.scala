@@ -16,8 +16,8 @@ class AgentSpec extends Specification {
       |   penalize having gaps between the columns !utility4^ // Other Idea: Implement penalty no blank space between blocks?
       |
       | Solver should
-      |   pick MoveLeft for s1                   $solver1
       |   pick Drop for s3                       $solver2
+      |   pick RotateCW for s5                   $solver3
       |
       |  Penalty function should
       |    penalize having blocks stacked up high $penalty1
@@ -30,6 +30,7 @@ class AgentSpec extends Specification {
   val agent = new Agent
   val st1 = Stage.newState(Nil, view.Size, Stage.randomStream(new scala.util.Random))
 
+  //----------------------------------------------------------------------------
   def utility1 =
     agent.utility(st1) must_== 0.0
   def utility2 =
@@ -54,11 +55,15 @@ class AgentSpec extends Specification {
     agent.utility(s) must_== -14.0
   }
 
-  def solver1 =
-    agent.bestMove(st1) must_== MoveLeft
+  //----------------------------------------------------------------------------
   def solver2 =
-    agent.bestMove(st3) must_== Drop
+    agent.bestMove(st3) must oneOf[StageMessage](Tick)
 
+  val Blank0_8 = Seq((0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0), (9, 0))
+  def s5 = Stage.newState(Blank0_8 map { Block(_, Dummy) }, view.Size, Seq(TKind, Dummy, Dummy))
+  def solver3 = agent.bestMove(s5) must_== RotateCW
+
+  //----------------------------------------------------------------------------
   def penalty1 = {
     val s = Stage.newState(Seq(
       (0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6))
@@ -70,6 +75,7 @@ class AgentSpec extends Specification {
     agent.penalty(s) must_== 1.0
   }
 
+  //----------------------------------------------------------------------------
   def actionSeqs1 = {
     val s = Stage.newState(Nil, (10, 20), TKind :: TKind :: Nil)
     val seqs = agent.actionSeqs(s)

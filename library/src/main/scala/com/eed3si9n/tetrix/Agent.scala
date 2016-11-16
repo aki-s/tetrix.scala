@@ -28,19 +28,25 @@ class Agent extends StrictLogging {
     heights map { x => x * x } sum
   }
 
-  /** Best move based on score. */
+  /** Best move based on score.
+    *
+    * - score is calculated for all possible (action ++ Drop)
+    * @param s0
+    * @return `Tick` if no best move is found
+    */
   def bestMove(s0: GameState): StageMessage = {
-    var ret: StageMessage = MoveLeft
+    var ret: Seq[StageMessage] = Nil
     var score: Double = MinUtility
-    Stage.possibleMoves foreach { m =>
-      val u = utility(Stage.toTrans(m)(s0))
+    actionSeqs(s0) foreach { seq =>
+      val act = seq ++ Seq(Drop)
+      val u = utility(Function.chain(act map { Stage.toTrans })(s0))
       if (u > score) {
         score = u
-        ret = m
+        ret = seq
       }
     }
     logger.debug(s"Score $score for strategy $ret.")
-    ret
+    ret.headOption getOrElse Tick
   }
 
   /** Count how many times current piece can be slide to.
