@@ -39,7 +39,7 @@ lazy val library = (project in file("library")).
     initialCommands in console :=
       """import com.eed3si9n.tetrix._
         |import Stage._
-      """.stripMargin,
+      """.stripMargin
   )
 
 lazy val swing = (project in file("swing")).
