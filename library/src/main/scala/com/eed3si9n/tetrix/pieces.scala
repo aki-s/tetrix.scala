@@ -138,6 +138,7 @@ case object Piece {
       case SKind => 2
       case TKind => 4
       case ZKind => 2
+      case Dummy => 0
     }
   }
 
