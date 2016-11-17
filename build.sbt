@@ -46,6 +46,7 @@ lazy val swing = (project in file("swing")).
   settings(buildSettings: _*).
   settings(
     fork in run := true,
-    libraryDependencies += swingDepencencies.value
+    libraryDependencies += swingDepencencies.value,
+    javaOptions += "-XX:+PrintCompilation" // JVM JIT compilation option. You must set option at GUI config window when you run via IntelliJ.
   ).
   dependsOn(library)
