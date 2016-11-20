@@ -10,6 +10,7 @@
         </encoder>
     </appender>
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <append>false</append>
         <File>/tmp/tetrix.log</File>
         <encoder>
             <pattern>
