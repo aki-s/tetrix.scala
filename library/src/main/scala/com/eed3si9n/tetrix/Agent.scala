@@ -1,8 +1,8 @@
 package com.eed3si9n.tetrix
 
+import com.aki.util.LoggerManager
 import com.eed3si9n.util.Profiler
 import com.typesafe.scalalogging.StrictLogging
-import com.typesafe.scalalogging.Logger
 
 import scala.annotation.tailrec
 
@@ -30,7 +30,7 @@ class Agent extends StrictLogging {
     heights map { x => x * x } sum
   }
 
-  val devlog = Logger("dev")
+  val devlog = LoggerManager.dev
   /** Best move based on score.
     *
     * - score is calculated for all possible (action ++ Drop)
