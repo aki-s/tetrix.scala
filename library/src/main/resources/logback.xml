@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration debug="true">
+    <contextListener class ="com.aki.util.logback.ConfFileValidator"/>
     <property name="fmt" value="%d{HH:mm:ss.SSS} | %-5level | %-40thread | %-30X{akkaSource} | %-20logger{1} | %file:%line %method | %m%n%rEx"/>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <target>System.out</target>
