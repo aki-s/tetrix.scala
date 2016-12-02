@@ -12,7 +12,7 @@ class AgentActor(stageActor: ActorRef) extends Actor {
 
   override def receive: Receive = {
     case BestMove(s: GameState) =>
-      val message = Profiler.stopWatch() { (agent.bestMove(s)) }
+      val message = agent.bestMove(s)
       if (message ne Drop) stageActor ! message
   }
 }

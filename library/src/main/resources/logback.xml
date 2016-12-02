@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<configuration>
-    <property name="fmt" value="%d{HH:mm:ss.SSS} | %-5level | %-40thread | %-30X{akkaSource} | %-20logger{1} | %m%n%rEx"/>
+<configuration debug="true">
+    <property name="fmt" value="%d{HH:mm:ss.SSS} | %-5level | %-40thread | %-30X{akkaSource} | %-20logger{1} | %file:%line %method | %m%n%rEx"/>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <target>System.out</target>
         <encoder>
@@ -17,9 +17,23 @@
             </pattern>
         </encoder>
     </appender>
+    <appender name="DEV" class="ch.qos.logback.core.FileAppender">
+        <append>false</append>
+        <File>/tmp/tetrix.dev.log</File>
+        <encoder>
+            <pattern>
+                ${fmt}
+            </pattern>
+        </encoder>
+    </appender>
+
+    <logger name="dev" level="trace" additivity="false">
+        <appender-ref ref="DEV"/>
+    </logger>
 
     <root level="info">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </root>
+
 </configuration>

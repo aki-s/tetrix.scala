@@ -1,6 +1,8 @@
 package com.eed3si9n.tetrix
 
+import com.eed3si9n.util.Profiler
 import com.typesafe.scalalogging.StrictLogging
+import com.typesafe.scalalogging.Logger
 
 import scala.annotation.tailrec
 
@@ -28,6 +30,7 @@ class Agent extends StrictLogging {
     heights map { x => x * x } sum
   }
 
+  val devlog = Logger("dev")
   /** Best move based on score.
     *
     * - score is calculated for all possible (action ++ Drop)
@@ -37,37 +40,63 @@ class Agent extends StrictLogging {
   def bestMove(s0: GameState): StageMessage = {
     var ret: Seq[StageMessage] = Nil
     var score: Double = MinUtility
-    actionSeqs(s0) foreach { seq =>
-      val act = seq ++ Seq(Drop)
-      val u = utility(Function.chain(act map { Stage.toTrans })(s0))
-      if (u > score) {
-        score = u
-        ret = seq
+    Profiler.stopWatch("bestMove") {
+      val nodes = actionSeqs(s0) map { seq =>
+        val act = seq ++ Seq(Drop)
+        val s1 = Function.chain(act map {
+          Stage.toTrans
+        })(s0)
+        val u = utility(s1)
+        if (u > score) {
+          score = u
+          ret = seq
+        }
+        devlog.debug(s"1st score $score for strategy $ret.")
+        SearchNode(s1, act, u)
       }
+      nodes foreach { n =>
+        actionSeqs(n.state) foreach { seq =>
+          val act = seq ++ Seq(Drop)
+          val s1 = Function.chain(act map {
+            Stage.toTrans
+          })(n.state)
+          val u = utility(s1)
+          if (u > score) {
+            score = u
+            ret = n.actions ++ seq
+          }
+        }
+      }
+      devlog.debug(s"2nd score $score for strategy $ret.")
     }
-    logger.debug(s"Score $score for strategy $ret.")
     ret.headOption getOrElse Tick
   }
 
+  case class SearchNode(state: GameState, actions: Seq[StageMessage], score: Double)
+
   /** Count how many times current piece can be slide to.
     *
-    * @param s0
-    * @return (Left count, Right count)
+    * @param s0 GameState
+    * @return (Left count, Right count). (0, 0) for s0.kind.Dummy.
     */
   private[tetrix] def sideLimit(s0: GameState): (Int, Int) = {
+    /** Cannot stop sliding for `Dummy` kind. */
     @tailrec
     def leftLimit(n: Int, s: GameState): Int = {
       val next = Stage.moveLeft(s)
       if (next.currentPiece.pos == s.currentPiece.pos) n
       else leftLimit(n + 1, next)
     }
+    /** Cannot stop sliding for `Dummy` kind. */
     @tailrec
     def rightLimit(n: Int, s: GameState): Int = {
       val next = Stage.moveRight(s)
       if (next.currentPiece.pos == s.currentPiece.pos) n
       else rightLimit(n + 1, next)
     }
-    (leftLimit(0, s0), rightLimit(0, s0))
+
+    if (s0.currentPiece.kind == Dummy) (0, 0)
+    else (leftLimit(0, s0), rightLimit(0, s0))
   }
 
   /** Action pattern for Agent.
